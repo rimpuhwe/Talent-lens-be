@@ -2,12 +2,15 @@ package com.springboot.example.talentlens.Candidate;
 
 
 import com.springboot.example.talentlens.Enums.Gender;
+import com.springboot.example.talentlens.Enums.JobStatus;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import lombok.*;
 
 import java.sql.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -39,6 +42,9 @@ public class CandidateProfile{
     private String linkedInProfile;
 
     @NotNull
+    private String professionalProfile;
+
+    @NotNull
     @PastOrPresent(message = "the date must be of today or past not in future")
     private Date birthDate;
 
@@ -46,6 +52,25 @@ public class CandidateProfile{
 
     @Enumerated(EnumType.STRING)
     private Gender gender;
+
+    @Column(columnDefinition = "BYTEA")
+    private byte[] cvData;
+
+    private String cvFileName;
+
+    private String cvFileType;
+
+    @ElementCollection
+    @CollectionTable(name = "candidate_job_roles", joinColumns = @JoinColumn(name = "candidate_id"))
+    private List<String> jobRoles;
+
+    @Enumerated(EnumType.STRING)
+    private JobStatus workConditions;
+
+
+    private boolean profileCompleted = false;
+
+    private int completionPercentage = 0;
 
 
 

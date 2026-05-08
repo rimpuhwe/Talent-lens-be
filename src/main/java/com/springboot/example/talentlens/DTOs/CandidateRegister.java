@@ -1,5 +1,6 @@
 package com.springboot.example.talentlens.DTOs;
 
+import com.springboot.example.talentlens.Enums.Gender;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -27,4 +28,7 @@ public class CandidateRegister {
     @NotNull
     @PastOrPresent(message = "the date must be of today or past not in future")
     private Date birthDate;
+
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 }
