@@ -1,13 +1,12 @@
-package com.springboot.example.talentlens.Admin;
+package com.springboot.example.talentlens.Services;
 
-import com.springboot.example.talentlens.Candidate.Candidate;
+import com.springboot.example.talentlens.Candidate.CandidateProfile;
 import com.springboot.example.talentlens.DTOs.RecruiterStatusRequest;
 import com.springboot.example.talentlens.DTOs.ResponseMessage;
 import com.springboot.example.talentlens.Enums.AIExtractionStatus;
 import com.springboot.example.talentlens.Recruiter.Recruiter;
 import com.springboot.example.talentlens.Repositories.CandidateRepository;
 import com.springboot.example.talentlens.Repositories.RecruiterRepository;
-import com.springboot.example.talentlens.Services.EmailService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -80,7 +79,7 @@ public class AdminService {
         return message;
     }
 
-    public List<Candidate> getAllCandidates() {
+    public List<CandidateProfile> getAllCandidates() {
         return candidateRepository.findAll();
     }
 }

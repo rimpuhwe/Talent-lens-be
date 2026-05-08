@@ -1,9 +1,10 @@
-package com.springboot.example.talentlens.Admin;
+package com.springboot.example.talentlens.Controllers;
 
-import com.springboot.example.talentlens.Candidate.Candidate;
+import com.springboot.example.talentlens.Candidate.CandidateProfile;
 import com.springboot.example.talentlens.DTOs.RecruiterStatusRequest;
 import com.springboot.example.talentlens.DTOs.ResponseMessage;
 import com.springboot.example.talentlens.Recruiter.Recruiter;
+import com.springboot.example.talentlens.Services.AdminService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +44,7 @@ public class AdminController {
 
 
     @GetMapping("/candidates")
-    public ResponseEntity<List<Candidate>> getAllCandidates() {
+    public ResponseEntity<List<CandidateProfile>> getAllCandidates() {
         return new ResponseEntity<>(adminService.getAllCandidates(), HttpStatus.OK);
     }
 }

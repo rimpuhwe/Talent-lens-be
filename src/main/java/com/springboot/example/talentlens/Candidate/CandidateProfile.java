@@ -1,9 +1,13 @@
 package com.springboot.example.talentlens.Candidate;
 
 
+import com.springboot.example.talentlens.Enums.Gender;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import lombok.*;
 
+import java.sql.Date;
 import java.util.UUID;
 
 @Entity
@@ -11,7 +15,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Candidate{
+public class CandidateProfile{
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -25,14 +29,23 @@ public class Candidate{
     private String lastName;
 
     @Column(unique = true, length = 255)
-    private String email;
+    private String emailAddress;
 
     @Column(length = 50)
-    private String phone;
+    private String phoneNumber;
 
 
     @Column(name = "linkedin_url", length = 500)
     private String linkedInProfile;
+
+    @NotNull
+    @PastOrPresent(message = "the date must be of today or past not in future")
+    private Date birthDate;
+
+    private String Biography;
+
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 
 
 
