@@ -18,7 +18,9 @@ public class JobSignal {
     private Long id;
 
     private String jobPosition;
+    @Column(columnDefinition = "TEXT")
     private String jobDescription;
+
     private String workType;
     private String experienceLevel;
 
