@@ -5,4 +5,5 @@ public enum AIExtractionStatus {
     COMPLETED,
     FAILED,
     APPROVED,
+    DENIED
 }
