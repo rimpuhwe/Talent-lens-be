@@ -59,10 +59,7 @@ public class AdminService {
 
         recruiterRepository.save(recruiter);
 
-        return ResponseMessage.builder()
-                .Status(HttpStatus.OK)
-                .Message("Recruiter status updated to " + currentStatus + " and email sent.")
-                .build();
+        return new ResponseMessage(HttpStatus.OK ,"Recruiter status updated to " + currentStatus + " and email sent.");
     }
 
     private static String getString(RecruiterStatusRequest request) {

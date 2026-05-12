@@ -1,6 +1,8 @@
 package com.springboot.example.talentlens.Configurations.Authentication;
 
+import com.springboot.example.talentlens.Candidate.CandidateProfile;
 import com.springboot.example.talentlens.Enums.Role;
+import com.springboot.example.talentlens.Repositories.CandidateRepository;
 import com.springboot.example.talentlens.User.User;
 import com.springboot.example.talentlens.Repositories.UserRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,8 +20,10 @@ import java.util.Map;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
-    public CustomOAuth2UserService(UserRepository userRepository) {
+    private final CandidateRepository candidateRepository;
+    public CustomOAuth2UserService(UserRepository userRepository , CandidateRepository candidateRepository) {
         this.userRepository = userRepository;
+        this.candidateRepository = candidateRepository;
 
     }
 
@@ -51,8 +55,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 user.setAuthProvider(registrationId);
                 user.setUsername(username);
                 user.setPassword("");
-                user.setRole(assignRole(username));
+                user.setRole(assignRole());
                 userRepository.save(user);
+                if (user.getRole() == Role.CANDIDATE) {
+                    CandidateProfile profile = getCandidateProfile(username, fullName);
+                    candidateRepository.save(profile);
+                }
             } catch (Exception e) {
                 System.out.println("User with email " + username + " already exists or constraint violation occurred: " + e.getMessage());
             }
@@ -60,13 +68,28 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
 
         return new DefaultOAuth2User(
-                Collections.singleton(new SimpleGrantedAuthority("ROLE_" + assignRole(username))),
+                Collections.singleton(new SimpleGrantedAuthority("ROLE_" + assignRole())),
                 attributes,
                 nameAttributeKey
         );
     }
 
-    public Role assignRole(String email) {
+    private static CandidateProfile getCandidateProfile(String username, String fullName) {
+        CandidateProfile profile = new CandidateProfile();
+        profile.setEmailAddress(username);
+        profile.setFirstName(fullName);
+
+        if (fullName != null) {
+            String[] nameParts = fullName.split(" ", 2);
+            profile.setFirstName(nameParts[0]);
+            if (nameParts.length > 1) {
+                profile.setLastName(nameParts[1]);
+            }
+        }
+        return profile;
+    }
+
+    public Role assignRole() {
             return  Role.CANDIDATE;
     }
 

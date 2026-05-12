@@ -1,6 +1,7 @@
 package com.springboot.example.talentlens.Configurations.Authentication;
 
 
+import com.springboot.example.talentlens.Candidate.CandidateProfile;
 import com.springboot.example.talentlens.DTOs.*;
 import com.springboot.example.talentlens.Enums.AIExtractionStatus;
 import com.springboot.example.talentlens.Enums.Role;
@@ -13,6 +14,7 @@ import com.springboot.example.talentlens.Repositories.UserRepository;
 import com.springboot.example.talentlens.Services.EmailService;
 import com.springboot.example.talentlens.User.OtpVerification;
 import com.springboot.example.talentlens.User.User;
+import org.springframework.boot.reactor.netty.NettyWebServer;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -46,10 +48,8 @@ public class AuthService {
 
         public ResponseMessage registerCandidate(CandidateRegister candidateRegister) {
             if (repo.existsByUsername(candidateRegister.getEmail())) {
-                return ResponseMessage.builder()
-                        .Status(HttpStatus.CONFLICT)
-                        .Message("Email already registered")
-                        .build();
+                return new ResponseMessage(HttpStatus.CONFLICT , "Email already registered");
+
             }
             User user = new User();
             user.setFullName(candidateRegister.getFirstName().trim() + " " + candidateRegister.getLastName().trim());
@@ -58,6 +58,14 @@ public class AuthService {
             user.setRole(Role.CANDIDATE);
             user.setAuthProvider("JWT");
             repo.save(user);
+
+            CandidateProfile profile = new CandidateProfile();
+            profile.setFirstName(candidateRegister.getFirstName().trim());
+            profile.setLastName(candidateRegister.getLastName().trim());
+            profile.setEmailAddress(candidateRegister.getEmail());
+            profile.setBirthDate(candidateRegister.getBirthDate());
+            profile.setGender(candidateRegister.getGender());
+            candidateRepository.save(profile);
 
             String OTP = generateOtp(candidateRegister.getEmail());
 
@@ -74,10 +82,7 @@ public class AuthService {
 
             emailService.sendEmail(user.getUsername(), "Verify Your Account", body);
 
-            return ResponseMessage.builder().
-                    Status(HttpStatus.CREATED).
-                    Message("Successfully created an account. An OTP has been sent to your registered email address for account verification.").
-                    build();
+            return new ResponseMessage(HttpStatus.CREATED , "Successfully created an account. An OTP has been sent to your registered email address for account verification.");
 
         }
         public ResponseMessage registerRecruiter(RecruiterRegister recruiterRegister) {
@@ -104,10 +109,7 @@ public class AuthService {
             emailService.sendEmail(user.getUsername(), "Verify Your Account", body);
             recruiterRepository.save(recruiter);
 
-            return ResponseMessage.builder().
-                    Status(HttpStatus.CREATED).
-                    Message("Successfully created an account. Check your email address for confirmation").
-                    build();
+            return new ResponseMessage(HttpStatus.CREATED ,"Successfully created an account. Check your email address for confirmation");
         }
 
 
@@ -137,12 +139,7 @@ public class AuthService {
             }
         }
 
-        return LoginMessage.builder()
-                .Status(HttpStatus.OK)
-                .Message("Successfully Login")
-                .Token(jwtService.generateToken(user.getUsername(), user.getRole().name()))
-                .Role(user.getRole())
-                .build();
+        return new LoginMessage(HttpStatus.OK ,"Successfully Login" , jwtService.generateToken(user.getUsername(), user.getRole().name()), user.getRole());
     }
 
 
@@ -167,10 +164,7 @@ public class AuthService {
             }
            otp.setVerified(true);
            otpVerificationRepository.save(otp);
-           return ResponseMessage.builder().
-                   Status(HttpStatus.OK).
-                   Message("Successfully verified. Account Activated").
-                   build();
+           return new ResponseMessage(HttpStatus.OK,"Successfully verified. Account Activated");
        }
        private static Recruiter getRecruiter(RecruiterRegister recruiterRegister) {
            Recruiter recruiter = new Recruiter();

@@ -1,6 +1,7 @@
 package com.springboot.example.talentlens.Services;
 
 
+
 import com.springboot.example.talentlens.Candidate.CandidateProfile;
 import com.springboot.example.talentlens.DTOs.CandidateProfileDto;
 import com.springboot.example.talentlens.Repositories.CandidateRepository;
@@ -9,6 +10,9 @@ import com.springboot.example.talentlens.User.User;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -19,10 +23,13 @@ public class CandidateService {
 
     private final CandidateRepository candidateRepository;
     private final UserRepository userRepository;
+    private final Cloudinary cloudinary;
 
-    public CandidateService(CandidateRepository candidateRepository, UserRepository userRepository) {
+
+    public CandidateService(CandidateRepository candidateRepository, UserRepository userRepository , Cloudinary cloudinary) {
         this.candidateRepository = candidateRepository;
         this.userRepository = userRepository;
+        this.cloudinary = cloudinary;
     }
 
 
@@ -70,10 +77,16 @@ public class CandidateService {
         }
 
 
-        profile.setCvData(file.getBytes());
-        profile.setCvFileName(file.getOriginalFilename());
-        profile.setCvFileType(contentType);
+        Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
+                "resource_type", "auto",
+                "folder", "talentlens/candidates/cvs" // Keeps your Cloudinary dashboard organized
+        ));
 
+
+        String fileUrl = uploadResult.get("secure_url").toString();
+
+
+        profile.setCvUrl(fileUrl);
 
         evaluateProfileCompletion(profile);
         candidateRepository.save(profile);
@@ -102,7 +115,7 @@ public class CandidateService {
         if (profile.getLinkedInProfile() != null && !profile.getLinkedInProfile().isBlank()) completedFields++;
 
 
-        if (profile.getCvData() != null && profile.getCvData().length > 0) completedFields++;
+        if (profile.getCvUrl() != null && !profile.getCvUrl().isBlank()) completedFields++;
 
 
         int percentage = (int) (((double) completedFields / totalFields) * 100);
