@@ -2,9 +2,9 @@ spring:
   application:
     name: TalentLens
   datasource:
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    url: ${DB_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    url: ${SPRING_DATASOURCE_URL}
     driver-class-name: org.postgresql.Driver
   jpa:
     properties:
@@ -51,3 +51,8 @@ server:
 
 jwt:
   secret: ${JWT_SECRET}
+
+python:
+  ai:
+    service:
+      url: ${PYTHON_AI_SERVICE_URL}
