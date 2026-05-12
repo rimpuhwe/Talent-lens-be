@@ -4,12 +4,12 @@ package com.springboot.example.talentlens.Candidate;
 import com.springboot.example.talentlens.Enums.Gender;
 import com.springboot.example.talentlens.Enums.JobStatus;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import lombok.*;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,10 +41,10 @@ public class CandidateProfile{
     @Column(name = "linkedin_url", length = 500)
     private String linkedInProfile;
 
-    @NotNull
+
     private String professionalProfile;
 
-    @NotNull
+
     @PastOrPresent(message = "the date must be of today or past not in future")
     private Date birthDate;
 
@@ -53,12 +53,7 @@ public class CandidateProfile{
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @Column(columnDefinition = "BYTEA")
-    private byte[] cvData;
-
-    private String cvFileName;
-
-    private String cvFileType;
+    private String cvUrl;
 
     @ElementCollection
     @CollectionTable(name = "candidate_job_roles", joinColumns = @JoinColumn(name = "candidate_id"))
@@ -71,6 +66,14 @@ public class CandidateProfile{
     private boolean profileCompleted = false;
 
     private int completionPercentage = 0;
+
+
+    @ElementCollection
+    @CollectionTable(name = "candidate_role_tss", joinColumns = @JoinColumn(name = "candidate_id"))
+    private List<RoleTSS> roleTssScores = new ArrayList<>();
+
+
+    private Double globalAverageTSS = 0.0;
 
 
 

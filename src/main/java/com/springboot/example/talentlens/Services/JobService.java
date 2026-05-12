@@ -26,7 +26,7 @@ public class JobService {
     private final RecruiterRepository recruiterRepository;
     private final TechnicalBatchAssessmentRepository assessmentRepository;
 
-    @Value("${PYTHON_AI_SERVICE_URL:http://localhost:8000}")
+    @Value("${PYTHON_AI_SERVICE_URL:https://talent-ai-service.onrender.com/}")
     private String pythonServiceUrl;
     private final RestTemplate restTemplate = new RestTemplate();
 
