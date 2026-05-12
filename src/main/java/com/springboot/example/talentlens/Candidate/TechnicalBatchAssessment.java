@@ -26,5 +26,5 @@ public class TechnicalBatchAssessment {
     private int timeLimitMinutes;
 
     @Column(columnDefinition = "TEXT")
-    private String gradingRubricJson; // Storing the AI's rubric as a JSON string to grade candidates later
+    private String gradingRubricJson;
 }

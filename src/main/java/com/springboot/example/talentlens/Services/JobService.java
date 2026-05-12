@@ -83,8 +83,8 @@ public class JobService {
         return jobRepository.save(job);
     }
 
-    public List<JobSignal> getAllPublicJobs(String role, String workType) {
-        return jobRepository.findPublicJobs(JobStatus.OPEN, role, workType);
+    public List<JobSignal> getAllPublishedJobs() {
+        return jobRepository.findAll();
     }
 
     public JobSignal getJobDetails(Long id) {
