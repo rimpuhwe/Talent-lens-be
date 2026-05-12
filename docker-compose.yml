@@ -7,13 +7,13 @@ services:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
 
   app:
     build: .
-    container_name: medease-application
+    container_name: talent-lens
     ports:
       - "${PORT}:8080"
     environment:
