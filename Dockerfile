@@ -9,4 +9,4 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:21-jammy
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Xmx300m", "-jar", "app.jar"]
