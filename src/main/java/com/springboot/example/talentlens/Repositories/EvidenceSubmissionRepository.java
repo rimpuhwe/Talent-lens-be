@@ -9,4 +9,6 @@ import java.util.List;
 public interface EvidenceSubmissionRepository extends JpaRepository<EvidenceSubmission, Long> {
 
     List<EvidenceSubmission> findByEvidenceModuleCandidate(CandidateProfile candidate);
+
+    List<EvidenceSubmission> findByEvidenceModuleCandidateAndEvidenceModuleTargetRole(CandidateProfile candidate, String targetRole);
 }

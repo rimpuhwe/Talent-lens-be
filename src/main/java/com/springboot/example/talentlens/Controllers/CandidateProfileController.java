@@ -4,6 +4,7 @@ import com.springboot.example.talentlens.Candidate.CandidateProfile;
 import com.springboot.example.talentlens.DTOs.CandidateProfileDto;
 import com.springboot.example.talentlens.DTOs.ResponseMessage;
 import com.springboot.example.talentlens.Services.CandidateService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/profile")
 @PreAuthorize("hasRole('CANDIDATE')")
+@Tag(name = "Candidate Passport")
 public class CandidateProfileController {
 
     private final CandidateService candidateService;
@@ -51,27 +53,18 @@ public class CandidateProfileController {
         try {
             candidateService.uploadCv(file);
             return new ResponseEntity<>(
-                    ResponseMessage.builder()
-                            .Status(HttpStatus.OK)
-                            .Message("CV uploaded successfully and profile completion re-evaluated.")
-                            .build(),
+                    new ResponseMessage(HttpStatus.OK ,"CV uploaded successfully and profile completion re-evaluated."),
                     HttpStatus.OK
             );
         } catch (IllegalArgumentException e) {
 
             return new ResponseEntity<>(
-                    ResponseMessage.builder()
-                            .Status(HttpStatus.BAD_REQUEST)
-                            .Message(e.getMessage())
-                            .build(),
+                    new ResponseMessage(HttpStatus.BAD_REQUEST , e.getMessage()),
                     HttpStatus.BAD_REQUEST
             );
         } catch (Exception e) {
             return new ResponseEntity<>(
-                    ResponseMessage.builder()
-                            .Status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .Message("An error occurred while uploading the CV: " + e.getMessage())
-                            .build(),
+                    new ResponseMessage(HttpStatus.INTERNAL_SERVER_ERROR , "An error occurred while uploading the CV: " + e.getMessage()),
                     HttpStatus.INTERNAL_SERVER_ERROR
             );
         }

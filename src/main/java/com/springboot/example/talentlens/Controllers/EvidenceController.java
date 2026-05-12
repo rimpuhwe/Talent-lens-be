@@ -3,6 +3,7 @@ package com.springboot.example.talentlens.Controllers;
 import com.springboot.example.talentlens.Evidence.EvidenceModule;
 import com.springboot.example.talentlens.Evidence.EvidenceSubmission;
 import com.springboot.example.talentlens.Services.EvidenceService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/evidence")
 @PreAuthorize("hasRole('CANDIDATE')")
+@Tag(name = "Evidence Engine")
 public class EvidenceController {
 
     private final EvidenceService evidenceService;
