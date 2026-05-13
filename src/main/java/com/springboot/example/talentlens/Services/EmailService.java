@@ -1,31 +1,125 @@
 package com.springboot.example.talentlens.Services;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import com.springboot.example.talentlens.Candidate.CandidateProfile;
+import com.springboot.example.talentlens.Recruiter.Recruiter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
+@Slf4j
 public class EmailService {
-    private final JavaMailSender mailSender;
+    private static final String BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
 
-    public EmailService(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    @Value("${BREVO_API}")
+    private String brevoApiKey;
+
+    @Value("${BREVO_MAIL}")
+    private String fromEmail;
+
+    @Value("${BREVO_SENDER_NAME:TalentLens}")
+    private String fromName;
+
+
+    public void sendEmail(String to, String subject, String htmlContent) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.set("api-key", brevoApiKey);
+
+            Map<String, Object> payload = new HashMap<>();
+
+            payload.put("sender", Map.of(
+                    "email", fromEmail,
+                    "name", fromName
+            ));
+
+            payload.put("to", List.of(
+                    Map.of("email", to)
+            ));
+
+            payload.put("subject", subject);
+            payload.put("htmlContent", htmlContent);
+
+            HttpEntity<Map<String, Object>> request =
+                    new HttpEntity<>(payload, headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(
+                    BREVO_API_URL,
+                    HttpMethod.POST,
+                    request,
+                    String.class
+            );
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                log.info("Email sent to {}", to);
+            } else {
+                log.error("Brevo error: {}", response.getBody());
+            }
+
+        } catch (Exception e) {
+            log.error("Failed to send email to {}", to, e);
+        }
     }
 
-    public void sendEmail(String to, String subject, String Body) {
-        try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+    public void sendVerificationEmail(Object user, String otp) {
+        String email;
+        String name;
+        if (user instanceof CandidateProfile) {
+            email = ((CandidateProfile) user).getEmailAddress();
+            name = ((CandidateProfile) user).getFirstName();
+            if (email == null || name == null) {
+                log.error("Cannot send verification email: missing email or name");
+                return;
+            }
 
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(Body, true);
+            String html = String.format("""
+                    <html>
+                    <body style='font-family: Arial, sans-serif;'>
+                        <div style='max-width:600px;margin:auto;padding:20px;border:1px solid #ddd;'>
+                            <h2 style='color:#4CAF50;'>Email Verification</h2>
+                            <p>Hello <strong>%s</strong>,</p>
+                            <p>Your One-Time Password (OTP) for account verification is:</p>
+                            <div style='text-align:center;margin:20px;'>
+                                <span style='font-size:2em;letter-spacing:8px;background:#f4f4f4;padding:10px 20px;border-radius:5px;border:1px solid #ccc;'>%s</span>
+                            </div>
+                            <p>Enter this OTP in the app to verify your account. This code expires in 10 minutes.</p>
+                            <small>If you did not request this, please ignore this email.</small>
+                        </div>
+                    </body>
+                    </html>""", name, otp);
+            sendEmail(email, "Your OTP for TalentLens Account Verification", html);
+        }
+    }
+    public void sendConfirmationEmail(Object user) {
+        String email;
+        String name;
+        if (user instanceof Recruiter) {
+            email = ((Recruiter) user).getCompanyEmail();
+            name = ((Recruiter) user).getCompanyName();
+            if (email == null || name == null) {
+                log.error("Cannot send verification email: missing email or name");
+                return;
+            }
 
-            mailSender.send(message);
-        } catch (MessagingException e) {
-            throw new RuntimeException("Failed to send email", e);
+            String html = String.format("""
+              <html>
+                <body>
+                    <p>It a pleasure to have you trusting us <b>TalentLens</b> in Recruitment process to you <b>%s</b>.</p>
+                    <p>TalentLens will now help you get the talented candidates for job signals accurately , fast and transparently.</p>
+                    <br>
+                    <p>Your account is current under review , you will get notified once approved so that you can start publishing the job vacancy!</p>
+                </body>
+            </html>""", name);
+            sendEmail(email, "Account Under Review", html);
         }
     }
 }
