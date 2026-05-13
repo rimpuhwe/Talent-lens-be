@@ -70,7 +70,7 @@ public class AuthService {
 
 
 
-            emailService.sendVerificationEmail(user.getUsername(), OTP);
+            emailService.sendVerificationEmail(profile.getEmailAddress() , profile.getFirstName(), OTP);
 
             return new ResponseMessage(HttpStatus.CREATED , "Successfully created an account. An OTP has been sent to your registered email address for account verification.");
 
@@ -86,7 +86,7 @@ public class AuthService {
 
             Recruiter recruiter = getRecruiter(recruiterRegister);
 
-            emailService.sendConfirmationEmail(user.getUsername());
+            emailService.sendConfirmationEmail(recruiter.getCompanyEmail() , recruiter.getCompanyName());
             recruiterRepository.save(recruiter);
 
             return new ResponseMessage(HttpStatus.CREATED ,"Successfully created an account. Check your email address for confirmation");

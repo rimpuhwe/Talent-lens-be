@@ -1,7 +1,5 @@
 package com.springboot.example.talentlens.Services;
 
-import com.springboot.example.talentlens.Candidate.CandidateProfile;
-import com.springboot.example.talentlens.Recruiter.Recruiter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -70,12 +68,7 @@ public class EmailService {
         }
     }
 
-    public void sendVerificationEmail(Object user, String otp) {
-        String email;
-        String name;
-        if (user instanceof CandidateProfile) {
-            email = ((CandidateProfile) user).getEmailAddress();
-            name = ((CandidateProfile) user).getFirstName();
+    public void sendVerificationEmail(String email, String name, String otp) {
             if (email == null || name == null) {
                 log.error("Cannot send verification email: missing email or name");
                 return;
@@ -97,14 +90,10 @@ public class EmailService {
                     </body>
                     </html>""", name, otp);
             sendEmail(email, "Your OTP for TalentLens Account Verification", html);
-        }
+
     }
-    public void sendConfirmationEmail(Object user) {
-        String email;
-        String name;
-        if (user instanceof Recruiter) {
-            email = ((Recruiter) user).getCompanyEmail();
-            name = ((Recruiter) user).getCompanyName();
+    public void sendConfirmationEmail(String email, String name) {
+        
             if (email == null || name == null) {
                 log.error("Cannot send verification email: missing email or name");
                 return;
@@ -120,7 +109,7 @@ public class EmailService {
                 </body>
             </html>""", name);
             sendEmail(email, "Account Under Review", html);
-        }
+
     }
 }
 
