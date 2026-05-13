@@ -14,7 +14,6 @@ import com.springboot.example.talentlens.Repositories.UserRepository;
 import com.springboot.example.talentlens.Services.EmailService;
 import com.springboot.example.talentlens.User.OtpVerification;
 import com.springboot.example.talentlens.User.User;
-import org.springframework.boot.reactor.netty.NettyWebServer;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -69,18 +68,9 @@ public class AuthService {
 
             String OTP = generateOtp(candidateRegister.getEmail());
 
-            String body = String.format("""
-            <html>
-                <body>
-                    <p>You have successfully registered your account as a <b>candidate</b>.</p>
-                    <p>TalentLens will now help you land your dream jobs. You need to verify your account before we proceed.</p>
-                    <h2 style="color: #2e6c80;">Your OTP: %s</h2>
-                    <p>This code will expire in 10 minutes.</p>
-                </body>
-            </html>
-            """, OTP);
 
-            emailService.sendEmail(user.getUsername(), "Verify Your Account", body);
+
+            emailService.sendVerificationEmail(user.getUsername(), OTP);
 
             return new ResponseMessage(HttpStatus.CREATED , "Successfully created an account. An OTP has been sent to your registered email address for account verification.");
 
@@ -95,18 +85,8 @@ public class AuthService {
             repo.save(user);
 
             Recruiter recruiter = getRecruiter(recruiterRegister);
-            String body = """
-            <html>
-                <body>
-                    <p>It a pleasure to have you trusting us <b>TalentLens</b> in Recruitment process.</p>
-                    <p>TalentLens will now help you get the talented candidates for job signals accurately , fast and transparently.</p>
-                    <br>
-                    <p>Your account is current under review , you will get notified once approved so that you can start publishing the job vacancy!</p>
-                </body>
-            </html>
-            """;
 
-            emailService.sendEmail(user.getUsername(), "Verify Your Account", body);
+            emailService.sendConfirmationEmail(user.getUsername());
             recruiterRepository.save(recruiter);
 
             return new ResponseMessage(HttpStatus.CREATED ,"Successfully created an account. Check your email address for confirmation");

@@ -36,6 +36,7 @@ spring:
             user-name-attribute: login
 server:
   port: ${PORT:8080}
+  forward-headers-strategy: framework
 
 jwt:
   secret: ${JWT_SECRET}
