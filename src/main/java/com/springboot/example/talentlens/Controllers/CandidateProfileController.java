@@ -4,6 +4,7 @@ import com.springboot.example.talentlens.Candidate.CandidateProfile;
 import com.springboot.example.talentlens.DTOs.CandidateProfileDto;
 import com.springboot.example.talentlens.DTOs.ResponseMessage;
 import com.springboot.example.talentlens.Services.CandidateService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -17,7 +18,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/profile")
 @PreAuthorize("hasRole('CANDIDATE')")
-@Tag(name = "Candidate Passport")
+@Tag(name = "Candidate Passport" , description = "APIs for managing candidate profile, CV upload, and profile completion status")
 public class CandidateProfileController {
 
     private final CandidateService candidateService;
@@ -28,6 +29,10 @@ public class CandidateProfileController {
 
 
     @GetMapping("/me")
+    @Operation(
+            summary = "Get candidate profile",
+            description = "Returns the authenticated candidate profile information"
+    )
     public ResponseEntity<CandidateProfile> getProfile() {
         CandidateProfile profile = candidateService.getMyProfile();
         return new ResponseEntity<>(profile, HttpStatus.OK);
@@ -35,6 +40,10 @@ public class CandidateProfileController {
 
 
     @PostMapping("/complete")
+    @Operation(
+            summary = "Complete candidate profile",
+            description = "Creates or completes the authenticated candidate profile"
+    )
     public ResponseEntity<CandidateProfile> completeProfile(@Valid @RequestBody CandidateProfileDto request) {
         CandidateProfile updatedProfile = candidateService.updateOrCompleteProfile(request);
         return new ResponseEntity<>(updatedProfile, HttpStatus.OK);
@@ -42,6 +51,10 @@ public class CandidateProfileController {
 
 
     @PutMapping("/update")
+    @Operation(
+            summary = "Update candidate profile",
+            description = "Updates the authenticated candidate profile information"
+    )
     public ResponseEntity<CandidateProfile> updateProfile(@Valid @RequestBody CandidateProfileDto request) {
         CandidateProfile updatedProfile = candidateService.updateOrCompleteProfile(request);
         return new ResponseEntity<>(updatedProfile, HttpStatus.OK);
@@ -49,6 +62,10 @@ public class CandidateProfileController {
 
 
     @PostMapping(value = "/upload-cv", consumes = "multipart/form-data")
+    @Operation(
+            summary = "Upload candidate CV",
+            description = "Uploads a CV file and save it to the profile as a url from cloudinary completion status"
+    )
     public ResponseEntity<ResponseMessage> uploadCv(@RequestParam("file") MultipartFile file) {
         try {
             candidateService.uploadCv(file);
@@ -72,6 +89,10 @@ public class CandidateProfileController {
 
 
     @GetMapping("/status")
+    @Operation(
+            summary = "Get profile completion status",
+            description = "Returns profile completion information and CV upload status"
+    )
     public ResponseEntity<Map<String, Object>> getProfileStatus() {
         Map<String, Object> status = candidateService.getProfileStatus();
         return new ResponseEntity<>(status, HttpStatus.OK);

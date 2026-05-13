@@ -3,6 +3,7 @@ package com.springboot.example.talentlens.Controllers;
 import com.springboot.example.talentlens.Evidence.EvidenceModule;
 import com.springboot.example.talentlens.Evidence.EvidenceSubmission;
 import com.springboot.example.talentlens.Services.EvidenceService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,18 +15,26 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/evidence")
 @PreAuthorize("hasRole('CANDIDATE')")
-@Tag(name = "Evidence Engine")
+@Tag(name = "Evidence Engine" , description = "APIs for requesting assessment modules, submitting evidence, and viewing candidate evidence results")
 public class EvidenceController {
 
     private final EvidenceService evidenceService;
     public EvidenceController(EvidenceService evidenceService) { this.evidenceService = evidenceService; }
 
     @PostMapping("/request")
+    @Operation(
+            summary = "Request evidence module",
+            description = "Generates or retrieves an evidence module for a specific role and module type"
+    )
     public ResponseEntity<EvidenceModule> requestModule(@RequestBody Map<String, String> request) {
         return ResponseEntity.ok(evidenceService.requestModule(request.get("role"), request.get("moduleType")));
     }
 
     @PostMapping("/submit")
+    @Operation(
+            summary = "Submit evidence",
+            description = "Submits candidate evidence or answers for a specific evidence module"
+    )
     public ResponseEntity<EvidenceSubmission> submitEvidence(@RequestBody Map<String, Object> request) {
         Long moduleId = Long.valueOf(request.get("moduleId").toString());
         String answer = request.get("answer").toString();
@@ -33,11 +42,19 @@ public class EvidenceController {
     }
 
     @GetMapping("/my-results")
+    @Operation(
+            summary = "Get my evidence results",
+            description = "Returns all evidence submissions with the feedback generated"
+    )
     public ResponseEntity<List<EvidenceSubmission>> getMyResults() {
         return ResponseEntity.ok(evidenceService.getMyResults());
     }
 
     @GetMapping("/role-scores")
+    @Operation(
+            summary = "Get role scores",
+            description = "Returns calculated scores grouped by candidate roles"
+    )
     public ResponseEntity<Map<String, Double>> getRoleScores() {
         return ResponseEntity.ok(evidenceService.getRoleScores());
     }
