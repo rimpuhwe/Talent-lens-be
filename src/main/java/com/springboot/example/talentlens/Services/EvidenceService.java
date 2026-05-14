@@ -25,7 +25,7 @@ public class EvidenceService {
     private final CandidateRepository candidateRepository;
 
     // You will set this in application.yaml later (e.g., http://localhost:8000)
-    @Value("${PYTHON_AI_SERVICE_URL:http://localhost:8000}")
+    @Value("${PYTHON_AI_SERVICE_URL:https://talent-ai-production-1975.up.railway.app}")
     private String pythonServiceUrl;
 
     public EvidenceService(EvidenceModuleRepository moduleRepository,

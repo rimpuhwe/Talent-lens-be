@@ -1,10 +1,13 @@
 package com.springboot.example.talentlens.Controllers;
 
+import com.springboot.example.talentlens.DTOs.EvidenceRequest;
+import com.springboot.example.talentlens.DTOs.EvidenceSubmissionRequest;
 import com.springboot.example.talentlens.Evidence.EvidenceModule;
 import com.springboot.example.talentlens.Evidence.EvidenceSubmission;
 import com.springboot.example.talentlens.Services.EvidenceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -24,10 +27,13 @@ public class EvidenceController {
     @PostMapping("/request")
     @Operation(
             summary = "Request evidence module",
-            description = "Generates or retrieves an evidence module for a specific role and module type"
+            description = "Generates or retrieves an evidence module for a specific role(candidate's selected role) and module type. \"A\": \"a practical, real-world skill mission (e.g., data analysis, coding, financial modeling)\",\n" +
+                    "        \"B\": \"an ethical, communication, or professional dilemma requiring judgment\",\n" +
+                    "        \"C\": \"a learning agility exercise where you introduce a novel concept and ask them to apply it\",\n" +
+                    "        \"D\": \"a communication prompt requiring a structured, stakeholder-facing response\""
     )
-    public ResponseEntity<EvidenceModule> requestModule(@RequestBody Map<String, String> request) {
-        return ResponseEntity.ok(evidenceService.requestModule(request.get("role"), request.get("moduleType")));
+    public ResponseEntity<EvidenceModule> requestModule(@Valid @RequestBody EvidenceRequest request) {
+        return ResponseEntity.ok(evidenceService.requestModule(request.getRole(), request.getModuleType()));
     }
 
     @PostMapping("/submit")
@@ -35,12 +41,11 @@ public class EvidenceController {
             summary = "Submit evidence",
             description = "Submits candidate evidence or answers for a specific evidence module"
     )
-    public ResponseEntity<EvidenceSubmission> submitEvidence(@RequestBody Map<String, Object> request) {
-        Long moduleId = Long.valueOf(request.get("moduleId").toString());
-        String answer = request.get("answer").toString();
-        return ResponseEntity.ok(evidenceService.submitEvidence(moduleId, answer));
-    }
+    public ResponseEntity<EvidenceSubmission> submitEvidence(@Valid @RequestBody EvidenceSubmissionRequest request) {
 
+        // No more ugly casting or .toString() parsing!
+        return ResponseEntity.ok(evidenceService.submitEvidence(request.getModuleId(), request.getAnswer()));
+    }
     @GetMapping("/my-results")
     @Operation(
             summary = "Get my evidence results",
