@@ -1,6 +1,7 @@
 package com.springboot.example.talentlens.DTOs;
 
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -12,5 +13,6 @@ public class EvidenceSubmissionRequest {
     private Long moduleId;
 
     @NotBlank(message = "Answer cannot be blank")
+    @Column(columnDefinition = "TEXT")
     private String answer;
 }
